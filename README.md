@@ -1,2 +1,3 @@
-# emobileContract
-contracts for blockchain course project.
+# emobile
+emobile smart contract for blockchain's final project.
+
