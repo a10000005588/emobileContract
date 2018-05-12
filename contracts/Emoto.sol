@@ -41,6 +41,7 @@ contract Emoto {
     
     function getFundAddress()
         public
+        view
         returns (address)
     {
         return fundAddress;
@@ -48,7 +49,7 @@ contract Emoto {
     
     function getMobileInformation(address _emoto) 
         public
-        constant
+        view
         returns(bytes, string, address, bool) 
     {
         return (
@@ -62,7 +63,6 @@ contract Emoto {
     function payFee(uint256 _price) 
         public 
         payable 
-        returns(bool)
     {
         // check whether the passenger has enough ether or not.
         if(msg.sender <= 0) {
@@ -70,8 +70,7 @@ contract Emoto {
         }
         // input the mobile and passenger's address
         // and caculated the milage and get price
-        bool res = fundAddress.send(_price);
-        return res;
+        fundAddress.transfer(_price);
     }
     
     function () 

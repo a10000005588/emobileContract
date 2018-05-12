@@ -84,7 +84,7 @@ contract Fund {
         if(Profit <= initialFund) {
             revert();
         }
-        uint ProfitUnit = SafeMath.div(Profit, 10 ** precision);
+        uint ProfitUnit = SafeMath.safeDiv(Profit, 10 ** precision);
       
         // repay all the money to every invenstor
         for (uint i = 0; i <  investorsList.length; i++) {
