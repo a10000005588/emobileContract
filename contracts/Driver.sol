@@ -3,22 +3,49 @@ pragma solidity ^0.4.16;
 // Every mobile has their own contract name !
 contract Driver {  
     struct Drivers{
-        uint256 credit ;      // -5~5
-        string driverName;    //司機名稱
+        uint credit ;     
+        string driverName;
+        string phone;
+        address driverAddress;
+        uint isStore;
+        
     }
     
     mapping(address => Drivers) public driversStruct;
     address[] driverList;
     
-    function setDriver(address _driver,string _driverName , uint256 _credit) public returns(bool){
-        driverList.push(_driver);
+    function setDriver(address _driver,string _driverName ,uint256 _credit, address _driverAddress, string _phone) 
+        public 
+    {
+        if(driversStruct[_driver].isStore == 0) {
+            driverList.push(_driver);
+            driversStruct[_driver].isStore = 1;
+        }
+        
         driversStruct[_driver].credit = _credit;
         driversStruct[_driver].driverName = _driverName;
-        return true;
+        driversStruct[_driver].driverAddress = _driverAddress;
+        driversStruct[_driver].phone = _phone;
+
     }
     
-    function getDriver(address _driver) public  constant returns (uint256){
-        driverList.push(_driver);
+    function getDriverInformation(address _driver) 
+        public  
+        constant 
+        returns (uint, string, string)
+    {
+        return (
+            driversStruct[_driver].credit,
+            driversStruct[_driver].driverName,
+            driversStruct[_driver].phone
+        );
+    }
+    
+    function giveCreditForDriver(address _driver, uint credit) 
+        public
+        returns(uint)
+    {
+        driversStruct[_driver].credit += credit;
         return driversStruct[_driver].credit;
     }
 }
