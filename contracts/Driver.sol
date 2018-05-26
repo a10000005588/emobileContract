@@ -4,22 +4,20 @@ pragma solidity ^0.4.16;
 contract Driver {  
     struct Drivers{
         uint credit ;     
-        string driverName;
-        uint isStore;
-        
+        bytes32 driverName;
+        uint isStore; 
     }
-    
+
     mapping(address => Drivers) public driversStruct;
     address[] driverList;
     
-    function setDriverInformation(address _driver,string _driverName, uint256 _credit) 
+    function setDriverInformation(address _driver,bytes32 _driverName, uint256 _credit) 
         public 
     {
         if(driversStruct[_driver].isStore == 0) {
             driverList.push(_driver);
             driversStruct[_driver].isStore = 1;
         }
-        
         driversStruct[_driver].credit = _credit;
         driversStruct[_driver].driverName = _driverName;
     }
@@ -27,7 +25,7 @@ contract Driver {
     function getDriverInformation(address _driver) 
         public  
         view 
-        returns (uint, string)
+        returns (uint, bytes32)
     {
         return (
             driversStruct[_driver].credit,
