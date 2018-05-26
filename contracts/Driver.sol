@@ -5,8 +5,6 @@ contract Driver {
     struct Drivers{
         uint credit ;     
         string driverName;
-        string phone;
-        address driverAddress;
         uint isStore;
         
     }
@@ -14,7 +12,7 @@ contract Driver {
     mapping(address => Drivers) public driversStruct;
     address[] driverList;
     
-    function setDriver(address _driver,string _driverName ,uint256 _credit, address _driverAddress, string _phone) 
+    function setDriverInformation(address _driver,string _driverName, uint256 _credit) 
         public 
     {
         if(driversStruct[_driver].isStore == 0) {
@@ -24,20 +22,16 @@ contract Driver {
         
         driversStruct[_driver].credit = _credit;
         driversStruct[_driver].driverName = _driverName;
-        driversStruct[_driver].driverAddress = _driverAddress;
-        driversStruct[_driver].phone = _phone;
-
     }
     
     function getDriverInformation(address _driver) 
         public  
-        constant 
-        returns (uint, string, string)
+        view 
+        returns (uint, string)
     {
         return (
             driversStruct[_driver].credit,
-            driversStruct[_driver].driverName,
-            driversStruct[_driver].phone
+            driversStruct[_driver].driverName
         );
     }
     

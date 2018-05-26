@@ -22,7 +22,8 @@ contract Fund {
     address[] investorsList; // list of question keys so we can enumerate them
  
     function setInvestors(address _investor, bytes32 _investorName, uint256 _fund) 
-        private 
+        public 
+        payable
         returns(bool) 
     {
         if(_fund < 1000000000000000000) {
