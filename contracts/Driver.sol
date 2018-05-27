@@ -8,6 +8,13 @@ contract Driver {
         uint isStore; 
     }
 
+    event DriverInformation(
+        address indexed driver, 
+        bytes32 driverName, 
+        uint256 credit
+    );
+
+
     mapping(address => Drivers) public driversStruct;
     address[] driverList;
     
@@ -20,12 +27,14 @@ contract Driver {
         }
         driversStruct[_driver].credit = _credit;
         driversStruct[_driver].driverName = _driverName;
+
+        emit DriverInformation(_driver, driversStruct[_driver].driverName, driversStruct[_driver].credit);
     }
     
     function getDriverInformation(address _driver) 
-        public  
-        view 
-        returns (uint, bytes32)
+        public   
+        view
+        returns (uint256, bytes32)
     {
         return (
             driversStruct[_driver].credit,
@@ -39,5 +48,12 @@ contract Driver {
     {
         driversStruct[_driver].credit += credit;
         return driversStruct[_driver].credit;
+    }
+
+    function test() 
+        public
+        view
+        returns(uint256 myNumber, string myString) {
+        return (23456, "Hello!%");
     }
 }
