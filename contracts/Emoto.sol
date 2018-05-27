@@ -5,8 +5,8 @@ contract Emoto {
     address fundAddress;
     
     struct Emotos {
-        bytes plate;  // mobile license-plate
-        string driverName;
+        bytes32 plate;  // mobile license-plate
+        bytes32 driverName;
         address driverAddress;
         uint isStore;
         bool isLock;
@@ -17,8 +17,8 @@ contract Emoto {
 
     function setEmotoInfomation(
         address _emoto, 
-        bytes _plate, 
-        string _driverName,
+        bytes32 _plate, 
+        bytes32 _driverName,
         address _driverAddress
     ) 
         public 
@@ -50,7 +50,7 @@ contract Emoto {
     function getMobileInformation(address _emoto) 
         public
         view
-        returns(bytes, string, address, bool) 
+        returns(bytes32, bytes32, address, bool) 
     {
         return (
             emotoStruct[_emoto].plate,
