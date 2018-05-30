@@ -49,11 +49,4 @@ contract Driver {
         driversStruct[_driver].credit += credit;
         return driversStruct[_driver].credit;
     }
-
-    function test() 
-        public
-        view
-        returns(uint256 myNumber, string myString) {
-        return (23456, "Hello!%");
-    }
 }
