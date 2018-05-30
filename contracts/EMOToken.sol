@@ -44,10 +44,10 @@ contract EMOToken is ERC20Interface, Owned {
     string public  name;
     uint8 public decimals;
     uint public _totalSupply;
-
+    uint public _numberOfSoldToken;
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-
+    
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -55,10 +55,10 @@ contract EMOToken is ERC20Interface, Owned {
     function EMOToken() public {
         symbol = "EMO";
         name = "Emoto Token";
-        decimals = 18;
-        _totalSupply = 100000000000000000000000000;
-        balances[0xec2748BF4f6ECAe5067C810E99AE15C6032fa3C2] = _totalSupply;
-        Transfer(address(0), 0xec2748BF4f6ECAe5067C810E99AE15C6032fa3C2, _totalSupply);
+        decimals = 1;
+        _totalSupply = 1000;
+        balances[0xca35b7d915458ef540ade6068dfe2f44e8fa733c] = _totalSupply;
+        Transfer(address(0), 0xca35b7d915458ef540ade6068dfe2f44e8fa733c, _totalSupply);
     }
 
 
@@ -66,9 +66,8 @@ contract EMOToken is ERC20Interface, Owned {
     // Total supply
     // ------------------------------------------------------------------------
     function totalSupply() public constant returns (uint) {
-        return _totalSupply  - balances[address(0)];
+        return _totalSupply - balances[address(0)];
     }
-
 
     // ------------------------------------------------------------------------
     // Get the token balance for account tokenOwner
@@ -84,8 +83,8 @@ contract EMOToken is ERC20Interface, Owned {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transfer(address to, uint tokens) public returns (bool success) {
-        balances[msg.sender] = SafeMath.safeSub(balances[msg.sender], tokens);
-        balances[to] = SafeMath.safeAdd(balances[to], tokens);
+        balances[msg.sender] = SafeMath.sub(balances[msg.sender], tokens);
+        balances[to] = SafeMath.add(balances[to], tokens);
         Transfer(msg.sender, to, tokens);
         return true;
     }
@@ -107,7 +106,7 @@ contract EMOToken is ERC20Interface, Owned {
 
 
     // ------------------------------------------------------------------------
-    // Transfer tokens from the from account to the to account
+    // Transfer tokens from the "from" account to the "to" account
     // 
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
@@ -116,9 +115,9 @@ contract EMOToken is ERC20Interface, Owned {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
-        balances[from] = SafeMath.safeSub(balances[from], tokens);
-        allowed[from][msg.sender] = SafeMath.safeSub(allowed[from][msg.sender], tokens);
-        balances[to] = SafeMath.safeAdd(balances[to], tokens);
+        balances[from] = SafeMath.sub(balances[from], tokens);
+        allowed[from][msg.sender] = SafeMath.sub(allowed[from][msg.sender], tokens);
+        balances[to] = SafeMath.add(balances[to], tokens);
         emit Transfer(from, to, tokens);
         return true;
     }

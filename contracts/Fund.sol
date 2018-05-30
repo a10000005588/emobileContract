@@ -1,43 +1,50 @@
 pragma solidity ^0.4.16;
 
 import "./SafeMath.sol";
+import "./EMOToken.sol";
 
 contract Fund {
-    /*
-       Problem:
-         1. For couting fund. Calculation will take too mush gas.
-         2. How to control the amount of who has hold the EMO tokens ?
-    */
+    address emotoCoinAddress;
+    address company = 0xca35b7d915458ef540ade6068dfe2f44e8fa733c;
+    uint companyRatio = 40;
+    uint dividendsRatio = 50; // stock dividens for investors.
+    uint EMOtotalSupply = EMOToken_totalSupply();
     
-    uint initialFund = 100000000000000000000; // 100 ether
-    uint companyFee = 5;
-    uint dividendsRatio = 40; // stock dividens for investors.
+    EMOToken instanceEmotoCoin = EMOToken(emotoCoinAddress);
+
+    function Fund(address _EMOTokenAddress) {
+        emotoCoinAddress = _EMOTokenAddress;
+    }
+    
+    function EMOToken_balanceOf(address _investor) constant returns (uint) {
+        return instanceEmotoCoin.balanceOf(_investor);
+    }
+    
+    function EMOToken_totalSupply() constant returns (uint256) {
+        return instanceEmotoCoin.totalSupply();
+    }
     
     struct Investors {
         bytes32 name;  // (up to 32 bytes)
-        uint256 funds; // check how many cash amount of investors
+        uint256 tokenNumber; // check how many cash amount of investors
     }
     
     mapping(address => Investors) public investorsStruct;
     address[] investorsList; // list of question keys so we can enumerate them
- 
-    function setInvestors(address _investor, bytes32 _investorName, uint256 _fund) 
+
+    function setInvestors(address _investor, bytes32 _investorName) 
         public 
-        payable
+        payable 
         returns(bool) 
     {
-        if(_fund < 1000000000000000000) {
-            revert();
-        }
         
         // if no data in list, push into the investorsList...
-        if(investorsStruct[_investor].funds == 0) {
+        if(EMOToken_balanceOf(_investor) == 0) {
             investorsList.push(_investor);
         }
         
         investorsStruct[_investor].name = _investorName;
-        investorsStruct[_investor].funds = _fund;
-        
+
         return true;
     }
     
@@ -54,7 +61,7 @@ contract Fund {
         constant 
         returns(bytes32, uint256) 
     {
-        return (investorsStruct[index].name, investorsStruct[index].funds);
+        return (investorsStruct[index].name, investorsStruct[index].tokenNumber);
     }
     
     function getTotalProfit()
@@ -65,34 +72,44 @@ contract Fund {
         return address(this).balance;
     }
     
-    // Calulate Dividends.
+    // Calculate investors dividends.
     function getDividendsValue() 
         public 
         constant 
         returns(uint) 
     {
         uint funds = address(this).balance;
-        uint dividens = funds * SafeMath.percent(100, dividendsRatio, 3);
+        uint dividens = funds * SafeMath.percent(dividendsRatio, 100, 3) / 1000;
+        return dividens;
+    }
+    
+    // Calculate company's dividends.
+    function getCompanyDividendsValue() 
+        public 
+        constant 
+        returns(uint) 
+    {
+        uint funds = address(this).balance;
+        uint dividens = funds * SafeMath.percent(companyRatio, 100, 3) / 1000;
         return dividens;
     }
     
     // Stock Dividend from Retained Earnings
     // redistributed profit to all the investors.
-    function refund(uint precision) 
+    function refund() 
+        payable 
         public 
     {
-        uint Profit = getDividendsValue();
-        if(Profit <= initialFund) {
-            revert();
-        }
-        uint ProfitUnit = SafeMath.safeDiv(Profit, 10 ** precision);
-      
+        uint companyProfit = getCompanyDividendsValue();
+        uint totalDividen = getDividendsValue();
+        uint dividen;
+        company.transfer(companyProfit);
+        
         // repay all the money to every invenstor
         for (uint i = 0; i <  investorsList.length; i++) {
-            // Investors[0] for company investors[1] for passenger, investors[2] and other are investors...
-            // Calculate shareholding ratio for each investor.
-            uint ratio = SafeMath.percent(investorsStruct[investorsList[i]].funds, Profit, precision);
-            investorsList[i].transfer(ProfitUnit * ratio);
+          //  Calculate shareholding ratio for each investor.
+            dividen = totalDividen * SafeMath.percent(EMOToken_balanceOf(investorsList[i]), EMOtotalSupply , 3) / 1000;
+            investorsList[i].transfer(dividen);
         }
     }
     
