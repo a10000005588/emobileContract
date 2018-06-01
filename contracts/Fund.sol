@@ -5,23 +5,23 @@ import "./EMOToken.sol";
 
 contract Fund {
     address emotoCoinAddress;
-    address company = 0xca35b7d915458ef540ade6068dfe2f44e8fa733c;
+    address company;
     uint companyRatio = 40;
     uint dividendsRatio = 50; // stock dividens for investors.
-    uint EMOtotalSupply = EMOToken_totalSupply();
-    
-    EMOToken instanceEmotoCoin = EMOToken(emotoCoinAddress);
 
-    function Fund(address _EMOTokenAddress) {
+    function Fund(address _EMOTokenAddress) public {
         emotoCoinAddress = _EMOTokenAddress;
+        company = msg.sender;
+        EMOToken(emotoCoinAddress);
+    }
+
+
+    function EMOToken_balanceOf(address _investor) constant public returns (uint) {
+        return EMOToken(emotoCoinAddress).balanceOf(_investor);
     }
     
-    function EMOToken_balanceOf(address _investor) constant returns (uint) {
-        return instanceEmotoCoin.balanceOf(_investor);
-    }
-    
-    function EMOToken_totalSupply() constant returns (uint256) {
-        return instanceEmotoCoin.totalSupply();
+    function EMOToken_totalSupply() constant public returns(uint){
+        return EMOToken(emotoCoinAddress).totalSupply();
     }
     
     struct Investors {
@@ -100,6 +100,7 @@ contract Fund {
         payable 
         public 
     {
+        uint EMOtotalSupply = EMOToken_totalSupply();
         uint companyProfit = getCompanyDividendsValue();
         uint totalDividen = getDividendsValue();
         uint dividen;
@@ -107,7 +108,7 @@ contract Fund {
         
         // repay all the money to every invenstor
         for (uint i = 0; i <  investorsList.length; i++) {
-          //  Calculate shareholding ratio for each investor.
+            //  Calculate shareholding ratio for each investor.
             dividen = totalDividen * SafeMath.percent(EMOToken_balanceOf(investorsList[i]), EMOtotalSupply , 3) / 1000;
             investorsList[i].transfer(dividen);
         }
