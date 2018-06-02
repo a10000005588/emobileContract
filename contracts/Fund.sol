@@ -9,43 +9,27 @@ contract Fund {
     uint companyRatio = 40;
     uint dividendsRatio = 50; // stock dividens for investors.
 
-    function Fund(address _EMOTokenAddress) public {
+    function Fund(address _EMOTokenAddress) {
         emotoCoinAddress = _EMOTokenAddress;
         company = msg.sender;
         EMOToken(emotoCoinAddress);
     }
 
 
-    function EMOToken_balanceOf(address _investor) constant public returns (uint) {
+    function EMO_balanceOf(address _investor) constant public returns (uint) {
         return EMOToken(emotoCoinAddress).balanceOf(_investor);
     }
     
-    function EMOToken_totalSupply() constant public returns(uint){
+    function EMO_totalSupply() constant returns(uint){
         return EMOToken(emotoCoinAddress).totalSupply();
     }
     
-    struct Investors {
-        bytes32 name;  // (up to 32 bytes)
-        uint256 tokenNumber; // check how many cash amount of investors
+    function EMO_getInvestorList(uint256 _index) constant returns(address) {
+        return EMOToken(emotoCoinAddress).getInvestorList(_index);
     }
     
-    mapping(address => Investors) public investorsStruct;
-    address[] investorsList; // list of question keys so we can enumerate them
-
-    function setInvestors(address _investor, bytes32 _investorName) 
-        public 
-        payable 
-        returns(bool) 
-    {
-        
-        // if no data in list, push into the investorsList...
-        if(EMOToken_balanceOf(_investor) == 0) {
-            investorsList.push(_investor);
-        }
-        
-        investorsStruct[_investor].name = _investorName;
-
-        return true;
+    function EMO_getInvestorListLength() constant returns(uint256) {
+        return EMOToken(emotoCoinAddress).getInvestorListLength();
     }
     
     function getInvestorCount() 
@@ -53,15 +37,7 @@ contract Fund {
         constant 
         returns(uint) 
     {
-        return investorsList.length;
-    }
-    
-    function getInvestors (address index) 
-        public 
-        constant 
-        returns(bytes32, uint256) 
-    {
-        return (investorsStruct[index].name, investorsStruct[index].tokenNumber);
+        return 0;
     }
     
     function getTotalProfit()
@@ -100,17 +76,19 @@ contract Fund {
         payable 
         public 
     {
-        uint EMOtotalSupply = EMOToken_totalSupply();
+        uint EMOtotalSupply = EMO_totalSupply();
         uint companyProfit = getCompanyDividendsValue();
         uint totalDividen = getDividendsValue();
         uint dividen;
+        uint invenstorLength = EMO_getInvestorListLength();
         company.transfer(companyProfit);
         
         // repay all the money to every invenstor
-        for (uint i = 0; i <  investorsList.length; i++) {
+        for (uint256 i = 0; i < invenstorLength; i++) {
             //  Calculate shareholding ratio for each investor.
-            dividen = totalDividen * SafeMath.percent(EMOToken_balanceOf(investorsList[i]), EMOtotalSupply , 3) / 1000;
-            investorsList[i].transfer(dividen);
+            address investor = EMO_getInvestorList(i);
+            dividen = totalDividen * SafeMath.percent(EMO_balanceOf(investor), EMOtotalSupply , 3) / 1000;
+            investor.transfer(dividen);
         }
     }
     

@@ -61,12 +61,12 @@ contract Emoto {
     }
     
     function payFee(uint256 _price) 
-        public 
-        payable 
+        public
+        payable
     {
         // check whether the passenger has enough ether or not.
         if(msg.sender <= 0) {
-            revert("No money");
+            revert("Money isn't enough!");
         }
         // input the mobile and passenger's address
         // and caculated the milage and get price
