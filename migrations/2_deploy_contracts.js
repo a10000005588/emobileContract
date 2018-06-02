@@ -6,8 +6,8 @@ var EMOToken = artifacts.require("../contracts/EMOToken.sol");
 
 module.exports = function(deployer) {
     deployer.deploy(SafeMath)
-        .then( () => deployer.deploy(Fund))
-        .then( () => deployer.deploy(Emoto))
-        .then( () => deployer.deploy(Driver)
-        .then( () => deployer.deploy(EMOToken)));
+        .then( () => deployer.deploy(EMOToken))
+        .then( () => deployer.deploy(Fund, EMOToken.address))
+        .then( () => deployer.deploy(Driver))
+        .then( () => deployer.deploy(Emoto, Driver.address, Fund.address));
 };

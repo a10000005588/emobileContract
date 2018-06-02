@@ -9,26 +9,26 @@ contract Fund {
     uint companyRatio = 40;
     uint dividendsRatio = 50; // stock dividens for investors.
 
-    function Fund(address _EMOTokenAddress) {
+    function Fund(address _EMOTokenAddress) public {
         emotoCoinAddress = _EMOTokenAddress;
         company = msg.sender;
         EMOToken(emotoCoinAddress);
     }
 
 
-    function EMO_balanceOf(address _investor) constant public returns (uint) {
+    function EMO_balanceOf(address _investor) view public returns (uint) {
         return EMOToken(emotoCoinAddress).balanceOf(_investor);
     }
     
-    function EMO_totalSupply() constant returns(uint){
+    function EMO_totalSupply() public view returns(uint){
         return EMOToken(emotoCoinAddress).totalSupply();
     }
     
-    function EMO_getInvestorList(uint256 _index) constant returns(address) {
+    function EMO_getInvestorList(uint256 _index) public view returns(address) {
         return EMOToken(emotoCoinAddress).getInvestorList(_index);
     }
     
-    function EMO_getInvestorListLength() constant returns(uint256) {
+    function EMO_getInvestorListLength() public view returns(uint256) {
         return EMOToken(emotoCoinAddress).getInvestorListLength();
     }
     
@@ -42,7 +42,7 @@ contract Fund {
     
     function getTotalProfit()
         public
-        constant
+        view
         returns(uint)
     {
         return address(this).balance;

@@ -42,7 +42,7 @@ contract Driver {
         );
     }
     
-    function giveCreditForDriver(address _driver, uint credit) 
+    function giveCreditForDriver(address _driver, uint256 credit) 
         public
         returns(uint)
     {

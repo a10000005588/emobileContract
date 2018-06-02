@@ -43,8 +43,8 @@ contract EMOToken is ERC20Interface, Owned {
         name = "Emoto Token";
         decimals = 1;
         _totalSupply = 1000;
-        balances[0xca35b7d915458ef540ade6068dfe2f44e8fa733c] = _totalSupply;
-        Transfer(address(0), 0xca35b7d915458ef540ade6068dfe2f44e8fa733c, _totalSupply);
+        balances[msg.sender] = _totalSupply;
+        emit Transfer(address(0), msg.sender, _totalSupply);
     }
 
     function totalSupply() public constant returns (uint) {
@@ -63,7 +63,7 @@ contract EMOToken is ERC20Interface, Owned {
         balances[msg.sender] = SafeMath.sub(balances[msg.sender], tokens);
         balances[to] = SafeMath.add(balances[to], tokens);
         
-        Transfer(msg.sender, to, tokens);
+        emit Transfer(msg.sender, to, tokens);
         return true;
     }
     
@@ -77,7 +77,7 @@ contract EMOToken is ERC20Interface, Owned {
 
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
-        Approval(msg.sender, spender, tokens);
+        emit Approval(msg.sender, spender, tokens);
         return true;
     }
 

@@ -1,9 +1,17 @@
+import "./Driver.sol";
 pragma solidity ^0.4.16;
 
 contract Emoto {
     int numberOfEmotos;
-    address fundAddress;
-    
+    address fundContractAddress;
+    address driverContractAddress;
+
+    constructor (address _driverContractAddress, address _fundContractAddress) public {
+        driverContractAddress = _driverContractAddress;
+        fundContractAddress = _fundContractAddress;
+        Driver(driverContractAddress);
+    }
+
     struct Emotos {
         bytes32 plate;  // mobile license-plate
         bytes32 driverName;
@@ -33,10 +41,10 @@ contract Emoto {
         emotoStruct[_emoto].plate = _plate;
     }
     
-    function setFundAddress(address _fundAddress)
+    function setFundAddress(address _fundContractAddress)
         public
     {
-        fundAddress = _fundAddress;
+        fundContractAddress = _fundContractAddress;
     }
     
     function getFundAddress()
@@ -44,7 +52,7 @@ contract Emoto {
         view
         returns (address)
     {
-        return fundAddress;
+        return fundContractAddress;
     }
     
     function getMobileInformation(address _emoto) 
@@ -60,17 +68,17 @@ contract Emoto {
         );
     }
     
-    function payFee(uint256 _price) 
+    function createPayment(uint256 credit, address driverAddress) 
         public
         payable
     {
         // check whether the passenger has enough ether or not.
-        if(msg.sender <= 0) {
+        if(msg.sender.balance <= msg.value) {
             revert("Money isn't enough!");
         }
-        // input the mobile and passenger's address
-        // and caculated the milage and get price
-        fundAddress.transfer(_price);
+
+        Driver(driverContractAddress).giveCreditForDriver(driverAddress,credit);
+        fundContractAddress.transfer(msg.value);
     }
     
     function () 
