@@ -3,17 +3,18 @@ pragma solidity ^0.4.16;
 // Every mobile has their own contract name !
 contract Driver {  
     struct Drivers{
-        uint credit ;     
+        uint256 credit;     
         bytes32 driverName;
-        uint isStore; 
+        uint256 count;
+        uint256 isStore; 
     }
 
     event DriverInformation(
         address indexed driver, 
         bytes32 driverName, 
-        uint256 credit
+        uint256 credit,
+        uint256 count
     );
-
 
     mapping(address => Drivers) public driversStruct;
     address[] driverList;
@@ -24,11 +25,12 @@ contract Driver {
         if(driversStruct[_driver].isStore == 0) {
             driverList.push(_driver);
             driversStruct[_driver].isStore = 1;
+            driversStruct[_driver].count = 0;
         }
         driversStruct[_driver].credit = _credit;
         driversStruct[_driver].driverName = _driverName;
-
-        emit DriverInformation(_driver, driversStruct[_driver].driverName, driversStruct[_driver].credit);
+        
+        emit DriverInformation(_driver, driversStruct[_driver].driverName, driversStruct[_driver].credit, driversStruct[_driver].count);
     }
     
     function getDriverInformation(address _driver) 
@@ -47,6 +49,8 @@ contract Driver {
         returns(uint)
     {
         driversStruct[_driver].credit += credit;
+        driversStruct[_driver].count += 1;
+
         return driversStruct[_driver].credit;
     }
 }
