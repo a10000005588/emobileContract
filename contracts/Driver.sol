@@ -36,11 +36,12 @@ contract Driver {
     function getDriverInformation(address _driver) 
         public   
         view
-        returns (uint256, bytes32)
+        returns (bytes32,uint256,uint256)
     {
         return (
+            driversStruct[_driver].driverName,
             driversStruct[_driver].credit,
-            driversStruct[_driver].driverName
+            driversStruct[_driver].count
         );
     }
     
