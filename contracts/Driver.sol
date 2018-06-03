@@ -49,7 +49,7 @@ contract Driver {
     function getAllDriverInformation() 
         public
         view
-        returns (bytes32[], uint256[], uint256[])
+        returns (uint, bytes32[], uint256[], uint256[])
     {
         uint dataLength = driverList.length;
         bytes32[] memory driverName = new bytes32[](dataLength);
@@ -62,7 +62,7 @@ contract Driver {
             count[i] = driversStruct[driverList[i]].count;
         }
 
-        return (driverName, credit, count);
+        return (dataLength, driverName, credit, count);
     }
     
     function giveCreditForDriver(address _driver, uint256 credit) 
