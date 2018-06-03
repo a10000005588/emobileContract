@@ -26,6 +26,7 @@ contract Driver {
             driverList.push(_driver);
             driversStruct[_driver].isStore = 1;
             driversStruct[_driver].count = 0;
+            driversStruct[_driver].credit = 0;
         }
         driversStruct[_driver].credit = _credit;
         driversStruct[_driver].driverName = _driverName;
@@ -44,14 +45,36 @@ contract Driver {
             driversStruct[_driver].count
         );
     }
+
+    function getAllDriverInformation() 
+        public
+        view
+        returns (bytes32[], uint256[], uint256[])
+    {
+        uint dataLength = driverList.length;
+        bytes32[] memory driverName = new bytes32[](dataLength);
+        uint256[] memory credit = new uint256[](dataLength);
+        uint256[] memory count = new uint256[](dataLength);
+
+        for (uint i = 0; i < dataLength; i++) {
+            driverName[i] = driversStruct[driverList[i]].driverName;
+            credit[i] = driversStruct[driverList[i]].credit;
+            count[i] = driversStruct[driverList[i]].count;
+        }
+
+        return (driverName, credit, count);
+    }
     
     function giveCreditForDriver(address _driver, uint256 credit) 
         public
-        returns(uint)
+        returns(uint256, uint256)
     {
         driversStruct[_driver].credit += credit;
         driversStruct[_driver].count += 1;
 
-        return driversStruct[_driver].credit;
+        return (
+            driversStruct[_driver].credit,
+            driversStruct[_driver].count
+        );
     }
 }
