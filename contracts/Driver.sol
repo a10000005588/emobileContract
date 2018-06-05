@@ -3,6 +3,7 @@ pragma solidity ^0.4.16;
 // Every mobile has their own contract name !
 contract Driver {  
     struct Drivers{
+        address driver;
         uint256 credit;     
         bytes32 driverName;
         uint256 count;
@@ -27,7 +28,9 @@ contract Driver {
             driversStruct[_driver].isStore = 1;
             driversStruct[_driver].count = 0;
             driversStruct[_driver].credit = 0;
+            driversStruct[_driver].driver = _driver;
         }
+
         driversStruct[_driver].credit = _credit;
         driversStruct[_driver].driverName = _driverName;
         
@@ -37,44 +40,48 @@ contract Driver {
     function getDriverInformation(address _driver) 
         public   
         view
-        returns (bytes32,uint256,uint256)
+        returns (bytes32,uint256,uint256,address)
     {
         return (
             driversStruct[_driver].driverName,
             driversStruct[_driver].credit,
-            driversStruct[_driver].count
+            driversStruct[_driver].count,
+            driversStruct[_driver].driver
         );
     }
 
     function getAllDriverInformation() 
         public
         view
-        returns (uint, bytes32[], uint256[], uint256[])
+        returns (uint, bytes32[], uint256[], uint256[], address[])
     {
         uint dataLength = driverList.length;
         bytes32[] memory driverName = new bytes32[](dataLength);
         uint256[] memory credit = new uint256[](dataLength);
         uint256[] memory count = new uint256[](dataLength);
+        address[] memory driver = new address[](dataLength);
 
         for (uint i = 0; i < dataLength; i++) {
             driverName[i] = driversStruct[driverList[i]].driverName;
             credit[i] = driversStruct[driverList[i]].credit;
             count[i] = driversStruct[driverList[i]].count;
+            driver[i] = driversStruct[driverList[i]].driver;
         }
 
-        return (dataLength, driverName, credit, count);
+        return (dataLength, driverName, credit, count, driver);
     }
     
     function giveCreditForDriver(address _driver, uint256 credit) 
         public
-        returns(uint256, uint256)
+        returns(uint256, uint256, address)
     {
         driversStruct[_driver].credit += credit;
         driversStruct[_driver].count += 1;
 
         return (
             driversStruct[_driver].credit,
-            driversStruct[_driver].count
+            driversStruct[_driver].count,
+            driversStruct[_driver].driver
         );
     }
 }
