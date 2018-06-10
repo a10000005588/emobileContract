@@ -1,97 +1,85 @@
+import "./Driver.sol";
 pragma solidity ^0.4.16;
 
-import "./SafeMath.sol";
-import "./EMOToken.sol";
+contract Emoto {
+    int numberOfEmotos;
+    address fundAddress;
+    address driverContractAddress;
 
-contract Fund {
-    address emotoCoinAddress;
-    address company;
-    uint companyRatio = 0;
-    uint dividendsRatio = 100; // stock dividens for investors.
-
-    function Fund(address _EMOTokenAddress) public payable{
-        emotoCoinAddress = _EMOTokenAddress;
-        company = msg.sender;
-        EMOToken(emotoCoinAddress);
+    constructor (address _driverContractAddress, address _fundAddress) public {
+        driverContractAddress = _driverContractAddress;
+        fundAddress = _fundAddress;
+        Driver(driverContractAddress);
     }
 
+    struct Emotos {
+        bytes32 plate;  // mobile license-plate
+        bytes32 driverName;
+        address driverAddress;
+        uint isStore;
+        bool isLock;
+    }
+    
+    mapping(address => Emotos) public emotoStruct;
+    address[] emotoList; // list of question keys so we can enumerate them
 
-    function EMO_balanceOf(address _investor) view public returns (uint) {
-        return EMOToken(emotoCoinAddress).balanceOf(_investor);
-    }
-    
-    function EMO_totalSupply() public view returns(uint){
-        return EMOToken(emotoCoinAddress).totalSupply();
-    }
-    
-    function EMO_getInvestorList(uint256 _index) public view returns(address) {
-        return EMOToken(emotoCoinAddress).getInvestorList(_index);
-    }
-    
-    function EMO_getInvestorListLength() public view returns(uint256) {
-        return EMOToken(emotoCoinAddress).getInvestorListLength();
-    }
-    
-    function getInvestorCount() 
+    function setEmotoInfomation(
+        address _emoto, 
+        bytes32 _plate, 
+        bytes32 _driverName,
+        address _driverAddress
+    ) 
         public 
-        constant 
-        returns(uint) 
     {
-        return 0;
+         // if no data in list, push into the emotoList...
+        if(emotoStruct[_emoto].isStore == 0) {
+            emotoList.push(_emoto);
+            emotoStruct[_emoto].isStore = 1;
+        }
+        emotoStruct[_emoto].driverName = _driverName;
+        emotoStruct[_emoto].driverAddress = _driverAddress;
+        emotoStruct[_emoto].plate = _plate;
     }
     
-    function getTotalProfit()
+    function setFundAddress(address _fundAddress)
+        public
+    {
+        fundAddress = _fundAddress;
+    }
+    
+    function getFundAddress()
         public
         view
-        returns(uint)
+        returns (address)
     {
-        return address(this).balance;
+        return fundAddress;
     }
     
-    // Calculate investors dividends.
-    function getDividendsValue() 
-        public 
-        constant 
-        returns(uint) 
+    function getMobileInformation(address _emoto) 
+        public
+        view
+        returns(bytes32, bytes32, address, bool) 
     {
-        uint funds = address(this).balance;
-        uint dividens = funds * SafeMath.percent(dividendsRatio, 100, 3) / 1000;
-        return dividens;
+        return (
+            emotoStruct[_emoto].plate,
+            emotoStruct[_emoto].driverName,
+            emotoStruct[_emoto].driverAddress,
+            emotoStruct[_emoto].isLock
+        );
     }
     
-    // Calculate company's dividends.
-    function getCompanyDividendsValue() 
-        public 
-        constant 
-        returns(uint) 
+    function createPayment(uint256 credit, address driverAddress) 
+        public
+        payable
     {
-        uint funds = address(this).balance;
-        uint dividens = funds * SafeMath.percent(companyRatio, 100, 3) / 1000;
-        return dividens;
+        // check whether the passenger has enough ether or not.
+        // if(msg.sender.balance <= msg.value) {
+        //     revert("Money isn't enough!");
+        // }
+
+        Driver(driverContractAddress).giveCreditForDriver(driverAddress,credit);
+        fundAddress.transfer(msg.value);
     }
-    
-    // Stock Dividend from Retained Earnings
-    // redistributed profit to all the investors.
-    function refund() 
-        payable 
-        public 
-    {
-        uint EMOtotalSupply = EMO_totalSupply();
-        // uint companyProfit = getCompanyDividendsValue();
-        uint totalDividen = getDividendsValue();
-        uint dividen;
-        uint invenstorLength = EMO_getInvestorListLength();
-        // company.transfer(companyProfit);
-        
-        // repay all the money to every invenstor
-        for (uint256 i = 0; i < invenstorLength; i++) {
-            //  Calculate shareholding ratio for each investor.
-            address investor = EMO_getInvestorList(i);
-            dividen = totalDividen * SafeMath.percent(EMO_balanceOf(investor), EMOtotalSupply , 3) / 1000;
-            investor.transfer(dividen);
-        }
-    }
-    
     function () 
         public 
         payable 

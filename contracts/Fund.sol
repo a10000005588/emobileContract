@@ -6,10 +6,10 @@ import "./EMOToken.sol";
 contract Fund {
     address emotoCoinAddress;
     address company;
-    uint companyRatio = 40;
-    uint dividendsRatio = 50; // stock dividens for investors.
+    uint companyRatio = 0;
+    uint dividendsRatio = 100; // stock dividens for investors.
 
-    function Fund(address _EMOTokenAddress) public {
+    function Fund(address _EMOTokenAddress) public payable{
         emotoCoinAddress = _EMOTokenAddress;
         company = msg.sender;
         EMOToken(emotoCoinAddress);
@@ -77,11 +77,11 @@ contract Fund {
         public 
     {
         uint EMOtotalSupply = EMO_totalSupply();
-        uint companyProfit = getCompanyDividendsValue();
+        // uint companyProfit = getCompanyDividendsValue();
         uint totalDividen = getDividendsValue();
         uint dividen;
         uint invenstorLength = EMO_getInvestorListLength();
-        company.transfer(companyProfit);
+        // company.transfer(companyProfit);
         
         // repay all the money to every invenstor
         for (uint256 i = 0; i < invenstorLength; i++) {
